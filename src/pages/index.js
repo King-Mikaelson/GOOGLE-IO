@@ -1,27 +1,34 @@
 import Image from "next/image";
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
+import { useEffect } from "react";
 
 export default function Home() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState,
+    formState: { errors, submittedData },
   } = useForm();
 
   const onSubmit = async (data) => {
-    console.log(data)
     try {
       // Send the bio data to your server for processing and storage
       await axios.post('https://sheet.best/api/sheets/b4db7f38-3426-49d1-9913-566c31700ea2', data);
-
+      
       // Optionally, you can send SMS notifications and emails here
       // based on the community activities and user preferences
     } catch (error) {
       console.error('Error submitting bio data:', error);
     }
   };
-  
+  useEffect(() => {
+    if (formState.isSubmitSuccessful) {
+      reset({ FullName: '', PhoneNumber: '', Email: ''});
+    }
+  }, [formState, submittedData, reset]);
+
   return (
     <main className="flex justify-center items-center py-8 flex-col md:px-24 px-3 border-[#51145a] md:h-screen pt-16 md:pt-0">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col  bg-white text-black  rounded-lg px-3 md:px-10 pb-12 pt-8 md:w-[500px] border-[#51145a] border border-solid">
